@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test – Für Dich 🤍</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; background: #fdf6f0; min-height: 100vh; color: #3a2a1f; }
+  .top-banner { background: #fff5f0; border-bottom: 1px solid #f0d5c8; padding: 18px 20px; text-align: center; position: sticky; top: 0; z-index: 10; }
+  .top-banner p { font-size: 17px; color: #9b4f3a; font-style: italic; letter-spacing: 0.3px; }
+  .top-banner .heart-row { font-size: 13px; color: #c9826b; margin-top: 4px; letter-spacing: 2px; }
+  .letters-container { padding: 20px 16px 40px; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  .day-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b07060; margin-bottom: 4px; }
+  .letter-card { background: #fffaf7; border: 1px solid #f0d5c8; border-radius: 16px; padding: 20px 20px 16px; position: relative; }
+  .letter-card.today { border: 1.5px solid #c9826b; background: #fff8f4; }
+  .letter-card.today::before { content: "Heute"; position: absolute; top: -10px; right: 16px; background: #c9826b; color: #fff; font-size: 11px; font-family: sans-serif; letter-spacing: 1px; padding: 2px 10px; border-radius: 20px; }
+  .letter-card.locked { background: #f9f3ef; border-color: #e8d5cb; opacity: 0.5; }
+  .letter-text { font-size: 16px; line-height: 1.7; color: #3a2a1f; }
+  .locked-text { font-size: 14px; color: #b07060; font-style: italic; font-family: sans-serif; }
+  .lock-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+  .tap-hint { font-size: 12px; color: #c9826b; font-style: italic; font-family: sans-serif; margin-top: 4px; }
+  .hidden { display: none; }
+  .footer { text-align: center; font-size: 12px; color: #c9a090; padding: 12px 0 30px; font-family: sans-serif; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<div class="top-banner">
+  <p>Hab eine tolle Reise mein Herz</p>
+  <div class="heart-row">♡ ♡ ♡</div>
+</div>
+
+<div class="letters-container" id="letters"></div>
+<div class="footer" id="footer"></div>
+
+<script>
+const today = new Date();
+const START = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+const letters = [
+  "I promise to plant kisses like seeds on your body, so in time you can grow to love yourself as I love you.",
+  "Thank you for loving the parts of me I felt I needed to hide."
+];
+
+const months = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const days = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+
+function daysBetween(a, b) {
+  return Math.floor((b - a) / (1000 * 60 * 60 * 24));
+}
+
+function formatDate(d) {
+  return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]}`;
+}
+
+function render() {
+  const now = new Date();
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayIdx = daysBetween(START, todayDate);
+  const container = document.getElementById('letters');
+  container.innerHTML = '';
+
+  for (let i = 0; i < 2; i++) {
+    const letterDate = new Date(START);
+    letterDate.setDate(START.getDate() + i);
+
+    const card = document.createElement('div');
+    card.className = 'letter-card';
+
+    const label = document.createElement('div');
+    label.className = 'day-label';
+    label.textContent = `Tag ${i + 1}  ·  ${formatDate(letterDate)}`;
+
+    const isUnlocked = i <= todayIdx;
+    if (i === todayIdx) card.classList.add('today');
+    if (!isUnlocked) card.classList.add('locked');
+
+    card.appendChild(label);
+
+    if (isUnlocked) {
+      const hint = document.createElement('p');
+      hint.className = 'tap-hint';
+      hint.textContent = 'Tippen zum Öffnen ♡';
+      card.appendChild(hint);
+
+      const txt = document.createElement('p');
+      txt.className = 'letter-text hidden';
+      txt.textContent = letters[i];
+      card.appendChild(txt);
+
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => {
+        const isOpen = !txt.classList.contains('hidden');
+        txt.classList.toggle('hidden');
+        hint.textContent = isOpen ? 'Tippen zum Öffnen ♡' : '';
+      });
+    } else {
+      const icon = document.createElement('span');
+      icon.className = 'lock-icon';
+      icon.textContent = '🔒';
+      card.appendChild(icon);
+      const txt = document.createElement('p');
+      txt.className = 'locked-text';
+      txt.textContent = 'Noch nicht geöffnet';
+      card.appendChild(txt);
+    }
+
+    container.appendChild(card);
+  }
+
+  document.getElementById('footer').textContent = 'Testversion – 2 Briefe ♡';
+}
+
+render();
+</script>
+</body>
+</html>
